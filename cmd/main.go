@@ -34,11 +34,6 @@ type Data struct {
 	smallestTetra smallestTetra
 }
 
-// type Result struct {
-// 	smallestIndex int
-// 	smallest      float64
-// }
-
 func reportTime(startTime time.Time) {
 	totalTime := time.Since(startTime)
 	fmt.Printf("\nTotal Execution Time: %v\n", totalTime)
@@ -113,59 +108,8 @@ func CreateNewDataSet() (*Data, error) {
 	return &d, nil
 }
 
-// func findSmallestInSlice(valids [][]int, points [][]float64, resultChan chan<- Result, start int, wg *sync.WaitGroup) {
-// 	defer wg.Done()
-// 	smallest := findVolumeOfValid(valids[0], points)
-// 	smallestIndex := 0
-// 	for i, v := range valids {
-// 		volume := findVolumeOfValid(v, points)
-// 		if volume < smallest {
-// 			smallest = volume
-// 			smallestIndex = i
-// 		}
-// 	}
-// 	resultChan <- Result{smallest: smallest, smallestIndex: smallestIndex + start}
-// }
-
-// func findSmallestOverall(valids [][]int, points [][]float64, numCores int) ([]int, float64) {
-// 	n := len(valids)
-// 	if n == 0 {
-// 		return []int{}, -1.0 // Return -1 if the slice is empty
-// 	}
-//
-// 	resultChan := make(chan Result, numCores)
-// 	var wg sync.WaitGroup
-// 	segmentSize := len(valids) / numCores
-// 	for i := 0; i < numCores; i++ {
-// 		start := i * segmentSize
-// 		end := (i + 1) * segmentSize
-// 		if end > n {
-// 			end = n
-// 		}
-// 		wg.Add(1)
-// 		fmt.Printf("\nspawning process number %v", i)
-// 		go findSmallestInSlice(valids[start:end], points, resultChan, start, &wg)
-// 	}
-//
-// 	go func() {
-// 		wg.Wait()
-// 		close(resultChan)
-// 	}()
-//
-// 	minValue := math.MaxFloat64
-// 	smallestIndex := -1
-// 	for result := range resultChan {
-// 		if result.smallest < minValue {
-// 			minValue = result.smallest
-// 			smallestIndex = result.smallestIndex
-// 		}
-// 	}
-// 	return valids[smallestIndex], minValue
-// }
-
 func (d *Data) findSmallest() {
 	target := 100
-	// valids := [][]int{}
 	d.smallestTetra.volume = math.MaxFloat64
 
 	for i := 0; i < len(d.points)-3; i++ {
@@ -181,13 +125,6 @@ func (d *Data) findSmallest() {
 									d.smallestTetra.volume = volume
 									d.smallestTetra.points = []*DataPoint{d.points[i], d.points[j], d.points[k], d.points[m]}
 								}
-
-								// valids = append(valids, []int{i, j, k, m})
-								// if len(valids)%2000000 == 0 {
-								// 	fmt.Printf("\nfound %v valid tetrahedra...", len(valids))
-								// 	fmt.Printf("\nat index %v out of %v", i, len(a))
-								// 	fmt.Printf("\n%v%% complete", 100*(float64(i)/float64(len(a))))
-								// }
 							} else if total > 100 {
 								break
 							}
@@ -202,14 +139,6 @@ func (d *Data) findSmallest() {
 		}
 	}
 }
-
-// func findVolumeOfValid(valid []int, points [][]float64) float64 {
-// 	p1 := points[valid[0]]
-// 	p2 := points[valid[1]]
-// 	p3 := points[valid[2]]
-// 	p4 := points[valid[3]]
-// 	return findVolume(p1, p2, p3, p4)
-// }
 
 func (d *Data) ParsePoints(scanner *bufio.Scanner) {
 	re := regexp.MustCompile(floatPattern)
@@ -273,63 +202,3 @@ func findVolume(p1 []float64, p2 []float64, p3 []float64, p4 []float64) float64 
 	volume := math.Abs(ScalarTripleProduct) / 6.0
 	return volume
 }
-
-// func findAllValid(a []int) [][]int {
-// 	allValid := [][]int{}
-// 	for i := 0; i < len(a); i++ {
-// 		tetra := []int{i}
-// 		target := 100 - a[i]
-// 		for j := i + 1; j < len(a); j++ {
-// 			tetra2 := tetra
-// 			if a[j] < target {
-// 				tetra2 = append(tetra, j)
-// 				target -= a[j]
-// 				for k := j + 1; k < len(a); k++ {
-// 					tetra3 := tetra2
-// 					if a[k] < target {
-// 						tetra3 = append(tetra2, k)
-// 						target -= a[k]
-// 						for m := k + 1; m < len(a); m++ {
-// 							// tetra4 := tetra3
-// 							if a[m] == target {
-// 								valid := append(tetra3, k)
-// 								allValid = append(allValid, valid)
-// 							}
-// 						}
-//
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return allValid
-// }
-// --------------------------------------
-// smallest := findVolumeOfValid(allValid[0], points)
-// smallestIndex := 0
-
-// smallestIndex := findSmallestOverall(allValid, points)
-// pointIndices := []int{allValid[smallestIndex]}
-// smallest := findVolumeOfValid()
-
-// for i, valid := range allValid {
-// 	volume := findVolumeOfValid(valid, points)
-// 	if volume < smallest {
-// 		smallest = volume
-// 		smallestIndex = i
-// 	}
-//
-// 	total := 0
-// 	for i := 0; i < len(valid); i++ {
-// 		total += nVals[valid[i]]
-// 	}
-// 	fmt.Printf("\nindices: %v\nnVals: %v\nindex: %v\ntotal: %v\n", valid, []int{nVals[valid[0]], nVals[valid[1]], nVals[valid[2]], nVals[valid[3]]}, i, total)
-// 	fmt.Printf("Volume: %v", findVolumeOfValid(valid, points))
-// }
-
-// fmt.Printf("\nIndices of Points: %v", allValid[smallestIndex])
-// fmt.Printf("\nPointA: %v", points[allValid[smallestIndex][0]])
-// fmt.Printf("\nPointB: %v", points[allValid[smallestIndex][1]])
-// fmt.Printf("\nPointC: %v", points[allValid[smallestIndex][2]])
-// fmt.Printf("\nPointD: %v", points[allValid[smallestIndex][3]])
-// fmt.Printf("\nVolume (test): %v", findVolumeOfValid(allValid[smallestIndex], points))
