@@ -24,10 +24,12 @@ const (
 type DataPoint struct {
 	location []float64
 	nVal     int
+	index    int
 }
 type smallestTetra struct {
-	points []*DataPoint
-	volume float64
+	points          []*DataPoint
+	volume          float64
+	originalIndices []int
 }
 type Data struct {
 	points        []*DataPoint
@@ -43,7 +45,7 @@ func main() {
 	begin := time.Now()
 	defer reportTime(begin)
 
-	// Start the pprof HTTP server in a separate goroutine
+	// Start the pprof HTTP server in a separate goroutine for profiling performance
 	go func() {
 		log.Println("Starting pprof server on :6060")
 		log.Println(http.ListenAndServe("localhost:6060", nil))
@@ -89,6 +91,7 @@ func main() {
 			*dataPoints.smallestTetra.points[2],
 			*dataPoints.smallestTetra.points[3],
 		})
+	fmt.Println("smallest Tetrahedron Original Indices: ", dataPoints.smallestTetra.originalIndices)
 
 	fmt.Println("\n------------- Testing Result -----------")
 	testVolume := findVolume(dataPoints.smallestTetra.points[0].location, dataPoints.smallestTetra.points[1].location, dataPoints.smallestTetra.points[2].location, dataPoints.smallestTetra.points[3].location)
@@ -124,6 +127,7 @@ func (d *Data) findSmallest() {
 								if volume < d.smallestTetra.volume {
 									d.smallestTetra.volume = volume
 									d.smallestTetra.points = []*DataPoint{d.points[i], d.points[j], d.points[k], d.points[m]}
+									d.smallestTetra.originalIndices = []int{d.points[i].index, d.points[j].index, d.points[k].index, d.points[m].index}
 								}
 							} else if total > 100 {
 								break
@@ -142,13 +146,13 @@ func (d *Data) findSmallest() {
 
 func (d *Data) ParsePoints(scanner *bufio.Scanner) {
 	re := regexp.MustCompile(floatPattern)
-
-	// dataPoints := []DataPoint{}
+	lineNumber := -1
 
 	for scanner.Scan() {
 		point := []float64{}
 		line := scanner.Text()
 		count := 0
+		lineNumber++
 
 		for _, match := range re.FindAllString(line, -1) {
 			var dataPoint DataPoint
@@ -158,6 +162,7 @@ func (d *Data) ParsePoints(scanner *bufio.Scanner) {
 				int, err := strconv.Atoi(match)
 				dataPoint.nVal = int
 				dataPoint.location = point
+				dataPoint.index = lineNumber
 				d.points = append(d.points, &dataPoint)
 				if err != nil {
 					fmt.Println(err)
