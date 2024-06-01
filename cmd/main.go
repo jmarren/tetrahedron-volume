@@ -78,14 +78,14 @@ func main() {
 	slices.SortFunc(pointsLarge.points, nValCmp)
 
 	// Print the first and last 5 points in the dataPoints.points slice (to verify they are sorted correctly)
-	for i := 0; i < 5; i++ {
-		fmt.Println(pointsSmall.points[i])
-		fmt.Println(pointsLarge.points[i])
-	}
-	for i := len(pointsSmall.points) - 1; i > len(pointsSmall.points)-5; i-- {
-		fmt.Println(pointsSmall.points[i])
-		fmt.Println(pointsLarge.points[i])
-	}
+	// for i := 0; i < 5; i++ {
+	// 	fmt.Println(pointsSmall.points[i])
+	// 	fmt.Println(pointsLarge.points[i])
+	// }
+	// for i := len(pointsSmall.points) - 1; i > len(pointsSmall.points)-5; i-- {
+	// 	fmt.Println(pointsSmall.points[i])
+	// 	fmt.Println(pointsLarge.points[i])
+	// }
 
 	// use the findSmallest method to find valid tetrahedrons with a total of 100
 	// then compare them to the current smallest tetrahedron found
@@ -95,7 +95,7 @@ func main() {
 
 	// Print the results for points_small.txt
 	fmt.Println("\n=============== Results ==================")
-	fmt.Println("\n--------------- points_small.txt -----------")
+	fmt.Println("\n\n\n--------------- points_small.txt -----------")
 	fmt.Println("\nsmallest Tetrahedron Volume: ", pointsSmall.smallestTetra.volume)
 	fmt.Println("smallest Tetrahedron Points: ",
 		[]DataPoint{
@@ -104,17 +104,20 @@ func main() {
 			*pointsSmall.smallestTetra.points[2],
 			*pointsSmall.smallestTetra.points[3],
 		})
-	fmt.Println("smallest Tetrahedron Original Indices: ", pointsSmall.smallestTetra.originalIndices)
+	finalAnswerPointsSmall := pointsSmall.smallestTetra.originalIndices
+	slices.Sort(finalAnswerPointsSmall)
 
-	fmt.Println("\n------------- Testing Result -----------")
+	fmt.Println("\n\n ************************ points_small.txt smallest valid tetrahedron indicies: ", finalAnswerPointsSmall, "***************************")
+
+	fmt.Println("\n............. Testing Result .............")
 	testVolume := findVolume(pointsSmall.smallestTetra.points[0].location, pointsSmall.smallestTetra.points[1].location, pointsSmall.smallestTetra.points[2].location, pointsSmall.smallestTetra.points[3].location)
 	fmt.Printf("\nVolume: %v", testVolume)
 
-	fmt.Println("\n\n----------------- Testing Result with Hard-Coded Values for points_small.txt result -----------------")
+	fmt.Println("\n\n.................. Testing Result with Hard-Coded Values for points_small.txt result ..................")
 	testVolume2 := findVolume([]float64{365.28, 374.98, 14.8}, []float64{432.13, 109.19, 264.16}, []float64{384.36, 176.25, 56.62}, []float64{300.7, 404.12, 257.92})
 	fmt.Printf("\nVolume: %v", testVolume2)
 
-	fmt.Println("\n -------------------- points_large.txt -----------------")
+	fmt.Println("\n\n\n -------------------- points_large.txt -----------------")
 
 	fmt.Println("\nsmallest Tetrahedron Volume: ", pointsLarge.smallestTetra.volume)
 	fmt.Println("smallest Tetrahedron Points: ",
@@ -124,19 +127,25 @@ func main() {
 			*pointsLarge.smallestTetra.points[2],
 			*pointsLarge.smallestTetra.points[3],
 		})
-	fmt.Println("smallest Tetrahedron Original Indices: ", pointsLarge.smallestTetra.originalIndices)
+	finalAnswerPointsLarge := pointsLarge.smallestTetra.originalIndices
+	slices.Sort(finalAnswerPointsLarge)
+
+	fmt.Println("\n\n ************************ points_large.txt smallest valid tetrahedron indicies: ", finalAnswerPointsLarge, "***************************")
 
 	fmt.Println("\n...... Testing Result .......")
 	testVolumePointsLarge := findVolume(pointsLarge.smallestTetra.points[0].location, pointsLarge.smallestTetra.points[1].location, pointsLarge.smallestTetra.points[2].location, pointsLarge.smallestTetra.points[3].location)
 	fmt.Printf("\nVolume: %v", testVolumePointsLarge)
 
-	fmt.Println("\n\n........ Testing Result with Hard-Coded Values for points_small.txt result ............")
-	testVolumePointsSmallHardCoded := findVolume([]float64{365.28, 374.98, 14.8}, []float64{432.13, 109.19, 264.16}, []float64{384.36, 176.25, 56.62}, []float64{300.7, 404.12, 257.92})
-	fmt.Printf("\nVolume: %v", testVolumePointsSmallHardCoded)
-
 	fmt.Println("\n\n............ Testing Result with Hard-Coded Values for points_large.txt result ..................")
 	testVolumePointsLargeHardCoded := findVolume([]float64{276.81, 69.17, 142.37}, []float64{134.53, 292.87, 385.94}, []float64{88.74, 442.01, 395.32}, []float64{156.04, 326.98, 265.29})
 	fmt.Printf("\nVolume: %v", testVolumePointsLargeHardCoded)
+
+	fmt.Println("\n\n ##################### FINAL ANSWER #####################")
+	fmt.Println(" #########################################################")
+	fmt.Println(`             points_small: `, finalAnswerPointsSmall)
+	fmt.Println(`             points_large: `, finalAnswerPointsLarge)
+	fmt.Println(" #########################################################")
+	fmt.Println(" #########################################################")
 }
 
 // Creates a new instance of the Data struct
